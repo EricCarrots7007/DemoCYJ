@@ -1,0 +1,178 @@
+﻿@model CYJModels.Models.CascadingModel
+<!DOCTYPE html>
+
+@{
+    ViewBag.Title = "Contact";
+    Layout = "~/Views/Shared/_mytemplate.cshtml";
+}
+
+<h2>Contact</h2>
+
+
+
+<script src="~/Scripts/jquery-1.10.2.min.js"></script>
+<link href="~/Content/bootstrap.min.css" rel="stylesheet" />
+<script src="~/Scripts/bootstrap.min.js"></script>
+
+
+<div class="container" style="width:40%;margin-top:2%">
+
+    <a href="#" class="btn btn-primary" data-toggle="modal" data-target="#myModal">New Goals</a>
+
+    <div class="modal fade" id="myModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <a href="#" class="close" data-dismiss="modal">&times;</a>
+                    <h3 class="modal-title">Inserting New Goals</h3>
+
+                </div>
+                <div class="modal-body">
+
+                    <form id="myForm">
+                        @using (Html.BeginForm("Contact", "Home", FormMethod.Post))
+                        {
+                            <br />
+                            <br />
+                            @Html.DropDownListFor(m => m.teamID, Model.TEAMS, "Please select")
+                            <br />
+                            <br />
+                            @Html.DropDownListFor(m => m.wstreamID, Model.WSTREAMS, "Please select")
+                            <br />
+                            <br />
+                            @Html.DropDownListFor(m => m.categID, Model.CATEGORIES, "Please select")
+                            <br />
+                            <br />
+                            @Html.DropDownListFor(m => m.subcategID, Model.SUBCATEGORIES, "Please select")
+                            <br />
+                            <br />
+                            @Html.DropDownListFor(m => m.agoalID, Model.AGOALS, "Please select")
+                            <br />
+                            <br />
+                            <input type="submit" value="Submit" />
+                        }
+
+                    </form>
+
+                    <div style="text-align:center;display:none" id="loaderDiv">
+                        <img src="~/Content/InternetSlowdown_Day.gif" width="150" />
+                    </div>
+
+
+                </div>
+                <div class="modal-footer">
+                    <a href="#" class="btn btn-default" data-dismiss="modal">Cancel</a>
+                    <input type="reset" value="Add" class="btn btn-success" id="btnSubmit" />
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+@*<!DOCTYPE html>*@
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index</title>
+</head>
+<body>
+   
+    <script src="~/Scripts/jquery-1.10.2.min.js"></script>
+    <script type="text/javascript">
+        $(function () {
+            $("select").each(function () {
+                if ($(this).find("option").length <= 1) {
+                    $(this).attr("disabled", "disabled");
+                }
+            });
+
+            $("select").change(function () {
+                var value = 0;
+                if ($(this).val() != "") {
+                    value = $(this).val();
+                }
+                var id = $(this).attr("id");
+                $.ajax({
+                    type: "POST",
+                    url: "/Home/AjaxMethod",
+                    data: '{type: "' + id + '", value: ' + value + '}',
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (response) {
+                        var dropDownId;
+                        var list;
+                        switch (id) {
+                            case "teamID":
+                                list = response.WSTREAMS;
+                                DisableDropDown("#wstreamID");
+                                DisableDropDown("#categID");
+                                PopulateDropDown("#wstreamID", list);
+                                break;
+                            case "wstreamID":
+                                dropDownId = "#categID";
+                                list = response.CATEGORIES;
+                                DisableDropDown("#categID");
+                                PopulateDropDown("#categID", list);
+                                break;
+                            case "categID":
+                                dropDownId = "#subcategID";
+                                list = response.SUBCATEGORIES;
+                                DisableDropDown("#subcategID");
+                                PopulateDropDown("#subcategID", list);
+                                break;
+                            case "subcategID":
+                                dropDownId = "#agoalID";
+                                list = response.AGOALS;
+                                DisableDropDown("#agoalID");
+                                PopulateDropDown("#agoalID", list);
+                                break;
+
+                        }
+
+                    },
+                    failure: function (response) {
+                        alert(response.responseText);
+                    },
+                    error: function (response) {
+                        alert(response.responseText);
+                    }
+                });
+            });
+        });
+
+        function DisableDropDown(dropDownId) {
+            $(dropDownId).attr("disabled", "disabled");
+            $(dropDownId).empty().append('<option selected="selected" value="0">Please select</option>');
+        }
+
+        function PopulateDropDown(dropDownId, list) {
+            if (list != null && list.length > 0) {
+                $(dropDownId).removeAttr("disabled");
+                $.each(list, function () {
+                    $(dropDownId).append($("<option></option>").val(this['Value']).html(this['Text']));
+                });
+            }
+        }
+
+        $(function () {
+            if ($("#teamID").val() != "" && $("#wstreamID").val() != "" && $("#categID").val() != "" && $("#subcategID").val() != "" && $("#agoalID").val() != "")
+            {
+                var message = "Team: " + $("#teamID option:selected").text();
+                message += "\nWStream: " + $("#wstreamID option:selected").text();
+                message += "\nCategory: " + $("#categID option:selected").text();
+                message += "\nSubcategory: " + $("#subcategID option:selected").text();
+                message += "\nAnnual Goal: " + $("#agoalID option:selected").val();
+
+                alert(message);
+            }
+        });
+    </script>
+</body>
+</html>

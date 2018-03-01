@@ -1,0 +1,92 @@
+﻿@model CYJModels.Models.HomePageViewModel
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_mytemplate.cshtml";
+}
+
+<script src="~/Scripts/jquery-1.10.2.min.js"></script>
+
+<h2>Cascading Dropdownlist</h2>
+<table>
+    <tr>
+        <td>
+            <label>Team</label>
+        </td>
+        <td>
+            @Html.DropDownListFor(x => x.teamID, Model.Teams.Select(c => new SelectListItem
+       {
+           Text = c.teamName,
+           Value = c.teamID.ToString(),
+           Selected = c.teamID == Model.teamID
+       }), "--Select Team--", new { @id = "teamId" })
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <label>Workstream</label>
+        </td>
+        <td id="Wstream">
+
+            @Html.DropDownListFor(x => x.wstreamID, new List<SelectListItem>(), "--Select Workstream--", new { @id = "wstreamID" })
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <label>Category</label>
+        </td>
+        <td id="Category">
+
+            @Html.DropDownListFor(x => x.categID, new List<SelectListItem>(), "--Select Category--", new { @id = "categID" })
+        </td>
+    </tr>
+</table>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#teamId').change(function () {
+            $.ajax({
+                type: "post",
+                url: "/Home/Changes",
+                data: { teamID: $('#teamId').val() },
+                datatype: "json",
+                traditional: true,
+                success: function (data) {
+                    var worksm = "<select id='workSM'>";
+                    worksm = worksm + '<option value="">--Select WorkStream--</option>';
+                    for (var i = 0; i < data.length; i++) {
+                        worksm = worksm + '<option value=' + data[i].Value + '>' + data[i].Text + '</option>';
+
+                    }
+
+                    worksm = worksm + '</select>';
+                    $('#Wstream').html(worksm);
+                } // end success
+            }); // end ajax
+        }); // end change
+
+    }); // end ready
+
+</script>
+<script>
+      $(document).ready(function () {
+    $('#wstreamId').change(function () {
+        $.ajax({
+            type: "post",
+            url: "/Home/Changing",
+            data: { wstreamID: $('#wstreamId').val() },
+            datatype: "json",
+            traditional: true,
+            success: function (data) {
+                var categ = "<select id='category'>";
+                categ = categ + '<option value="">--Select--</option>';
+                for (var i = 0; i < data.length; i++) {
+                    categ = categ + '<option value=' + data[i].Value + '>' + data[i].Text + '</option>';
+                }
+                categ = categ + '</select>';
+                $('#Category').html(categ);
+            } // end success
+        }); // end ajax
+    }); // end change
+  }); // end ready
+</script>
